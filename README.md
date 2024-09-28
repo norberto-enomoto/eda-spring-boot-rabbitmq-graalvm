@@ -1,93 +1,182 @@
-# Eda Spring Boot Rabbitmq
+# Diagrama de Arquitetura - Event Driven Architecture (EDA) utilizando RabbitMQ
 
+```mermaid
+graph TB
+    subgraph "Infraestrutura"
+        EUREKA["Eureka Server"]
+        GATEWAY["API Gateway<br>(Spring Cloud Gateway)"]
+        RABBITMQ["RabbitMQ"]
+    end
 
+    subgraph "Microsserviços"
+        PRODUCT["Serviço de Produtos<br>(Spring Boot + MySQL)"]
+        ORDER["Serviço de Pedidos<br>(Spring Boot + MySQL)"]
+        USER["Serviço de Usuários<br>(Spring Boot + MySQL)"]
+    end
 
-## Getting started
+    CLIENT["Cliente"]
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+    CLIENT -->|HTTP/HTTPS| GATEWAY
+    GATEWAY -->|HTTP| PRODUCT
+    GATEWAY -->|HTTP| ORDER
+    GATEWAY -->|HTTP| USER
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+    PRODUCT -->|Registry| EUREKA
+    ORDER -->|Registry| EUREKA
+    USER -->|Registry| EUREKA
+    GATEWAY -->|Service Discovery| EUREKA
 
-## Add your files
+    PRODUCT <-->|Pub/Sub| RABBITMQ
+    ORDER <-->|Pub/Sub| RABBITMQ
+    USER <-->|Pub/Sub| RABBITMQ
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+    subgraph "Banco de Dados"
+        PRODUCT_DB[(Produtos DB<br>MySQL)]
+        ORDER_DB[(Pedidos DB<br>MySQL)]
+        USER_DB[(Usuários DB<br>MySQL)]
+    end
 
+    PRODUCT -->|JDBC| PRODUCT_DB
+    ORDER -->|JDBC| ORDER_DB
+    USER -->|JDBC| USER_DB
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/enomoto/eda-spring-boot-rabbitmq.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
+- Executar o docker compose: docker-compose up
 
-- [ ] [Set up project integrations](https://gitlab.com/enomoto/eda-spring-boot-rabbitmq/-/settings/integrations)
+## Exemplos de Chamadas para os Endpoints
 
-## Collaborate with your team
+Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos, organizados na ordem Cliente, Produto e Pedido. Certifique-se de que os serviços estejam em execução antes de testar estas chamadas.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Serviço de Clientes
 
-## Test and Deploy
+1. Criar um novo cliente:
+   ```bash
+   curl -X POST http://localhost:8080/customers \
+   -H "Content-Type: application/json" \
+   -d '{
+     "name": "João Silva",
+     "email": "joao.silva@email.com",
+     "password": "senha123"
+   }'
+   ```
 
-Use the built-in continuous integration in GitLab.
+2. Obter todos os clientes:
+   ```bash
+   curl http://localhost:8080/customers
+   ```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+3. Obter um cliente específico (substitua {id} pelo ID real do cliente):
+   ```bash
+   curl http://localhost:8080/customers/{id}
+   ```
 
-***
+4. Atualizar um cliente (substitua {id} pelo ID real do cliente):
+   ```bash
+   curl -X PUT http://localhost:8080/customers/{id} \
+   -H "Content-Type: application/json" \
+   -d '{
+     "name": "João Silva Jr.",
+     "email": "joao.silva.jr@email.com"
+   }'
+   ```
 
-# Editing this README
+5. Deletar um cliente (substitua {id} pelo ID real do cliente):
+   ```bash
+   curl -X DELETE http://localhost:8080/customers/{id}
+   ```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Serviço de Produtos
 
-## Suggestions for a good README
+1. Criar um novo produto:
+   ```bash
+   curl -X POST http://localhost:8080/products \
+   -H "Content-Type: application/json" \
+   -d '{
+     "name": "Smartphone XYZ",
+     "description": "Último modelo com câmera de alta resolução",
+     "price": 999.99,
+     "stock": 100
+   }'
+   ```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+2. Obter todos os produtos:
+   ```bash
+   curl http://localhost:8080/products
+   ```
 
-## Name
-Choose a self-explaining name for your project.
+3. Obter um produto específico (substitua {id} pelo ID real do produto):
+   ```bash
+   curl http://localhost:8080/products/{id}
+   ```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+4. Atualizar um produto (substitua {id} pelo ID real do produto):
+   ```bash
+   curl -X PUT http://localhost:8080/products/{id} \
+   -H "Content-Type: application/json" \
+   -d '{
+     "name": "Smartphone XYZ - Edição Especial",
+     "description": "Versão atualizada com mais memória",
+     "price": 1099.99,
+     "stock": 50
+   }'
+   ```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+5. Deletar um produto (substitua {id} pelo ID real do produto):
+   ```bash
+   curl -X DELETE http://localhost:8080/products/{id}
+   ```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+6. Atualizar o estoque de um produto (substitua {id} pelo ID real do produto):
+   ```bash
+   curl -X PATCH http://localhost:8080/products/{id}/stock?quantity=20
+   ```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Serviço de Pedidos
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+1. Criar um novo pedido:
+   ```bash
+   curl -X POST http://localhost:8080/orders \
+   -H "Content-Type: application/json" \
+   -d '{
+     "customerId": 1,
+     "items": [
+       {
+         "productId": 1,
+         "quantity": 2,
+         "price": 999.99
+       }
+     ],
+     "totalAmount": 1999.98
+   }'
+   ```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+2. Obter todos os pedidos:
+   ```bash
+   curl http://localhost:8080/orders
+   ```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+3. Obter um pedido específico (substitua {id} pelo ID real do pedido):
+   ```bash
+   curl http://localhost:8080/orders/{id}
+   ```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+4. Atualizar o status de um pedido (substitua {id} pelo ID real do pedido):
+   ```bash
+   curl -X PATCH http://localhost:8080/orders/{id}/status?status=CONFIRMED
+   ```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Lembre-se de que essas chamadas estão sendo feitas através do API Gateway na porta 8080. O gateway redireciona as requisições para os serviços apropriados com base no path da URL.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Ao testar essas chamadas, você deve ver as respostas dos serviços e, nos logs, poderá observar os eventos sendo publicados no Kafka. Isso demonstra como a arquitetura orientada a eventos está funcionando em nosso sistema.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### Fluxo de Teste Recomendado
 
-## License
-For open source projects, say how it is licensed.
+Para testar o sistema de forma mais realista, você pode seguir este fluxo:
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+1. Crie um cliente usando o endpoint do Serviço de Clientes.
+2. Crie alguns produtos usando o endpoint do Serviço de Produtos.
+3. Crie um pedido para o cliente criado, incluindo os produtos criados, usando o endpoint do Serviço de Pedidos.
+4. Atualize o status do pedido para "CONFIRMED".
+5. Verifique se o estoque dos produtos foi atualizado adequadamente.
+
+Este fluxo simula um cenário típico de e-commerce e permite que você observe como os diferentes serviços interagem entre si através dos eventos publicados no Kafka.
