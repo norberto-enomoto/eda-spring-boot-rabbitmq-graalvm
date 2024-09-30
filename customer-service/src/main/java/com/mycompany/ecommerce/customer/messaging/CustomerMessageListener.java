@@ -7,10 +7,14 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
 import com.mycompany.ecommerce.customer.model.Customer;
 
+import lombok.extern.slf4j.Slf4j;
+
+
+
 @Component
+@Slf4j
 public class CustomerMessageListener {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerMessageListener.class);
@@ -21,13 +25,12 @@ public class CustomerMessageListener {
         key = "customer.created"
     ))
     public void handleCustomerCreated(Customer customer) {
-        logger.info("Received customer created event: {}", customer);
-        try {
-            logger.info("customer.created -> " + customer);
-        } catch (Exception e) {
-            logger.error("Error processing new customer", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","customer-exchange");
+        log.info("routingKey: {}","customer.created");
+        log.info("Mensagem: {}", customer);        
+        log.info("*********************************");
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -36,13 +39,12 @@ public class CustomerMessageListener {
         key = "customer.updated"
     ))
     public void handleCustomerUpdated(Customer customer) {
-        logger.info("Received customer updated event: {}", customer);
-        try {
-            logger.info("customer.updated -> " + customer);
-        } catch (Exception e) {
-            logger.error("Error processing updated customer", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","customer-exchange");
+        log.info("routingKey: {}","customer.updated");
+        log.info("Mensagem: {}", customer);        
+        log.info("*********************************");
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -51,12 +53,11 @@ public class CustomerMessageListener {
         key = "customer.deleted"
     ))
     public void handleCustomerDeleted(Long customerId) {
-        logger.info("Received customer deleted event for ID: {}", customerId);
-        try {
-            logger.info("customer.delete -> " + customerId);
-        } catch (Exception e) {
-            logger.error("Error processing deleted customer", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","customer-exchange");
+        log.info("routingKey: {}","customer.deleted");
+        log.info("Mensagem: {}", customerId);        
+        log.info("*********************************");
     }
 }

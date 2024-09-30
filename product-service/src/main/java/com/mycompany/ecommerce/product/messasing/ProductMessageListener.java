@@ -9,8 +9,10 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import com.mycompany.ecommerce.product.model.Product;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class ProductMessageListener {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductMessageListener.class);
@@ -21,13 +23,12 @@ public class ProductMessageListener {
         key = "product.created"
     ))
     public void handleProductCreated(Product Product) {
-        logger.info("Received Product created event: {}", Product);
-        try {
-            logger.info("Product.created -> " + Product);
-        } catch (Exception e) {
-            logger.error("Error processing new Product", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","product-exchange");
+        log.info("routingKey: {}","product.created");
+        log.info("Mensagem: {}", Product);        
+        log.info("*********************************");
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -36,13 +37,12 @@ public class ProductMessageListener {
         key = "product.updated"
     ))
     public void handleProductUpdated(Product Product) {
-        logger.info("Received Product updated event: {}", Product);
-        try {
-            logger.info("Product.updated -> " + Product);
-        } catch (Exception e) {
-            logger.error("Error processing updated Product", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","product-exchange");
+        log.info("routingKey: {}","product.updated");
+        log.info("Mensagem: {}", Product);        
+        log.info("*********************************");
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -51,12 +51,11 @@ public class ProductMessageListener {
         key = "product.deleted"
     ))
     public void handleProductDeleted(Long ProductId) {
-        logger.info("Received Product deleted event for ID: {}", ProductId);
-        try {
-            logger.info("Product.delete -> " + ProductId);
-        } catch (Exception e) {
-            logger.error("Error processing deleted Product", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","product-exchange");
+        log.info("routingKey: {}","product.deleted");
+        log.info("Mensagem: {}", ProductId);        
+        log.info("*********************************");        
     }
 }

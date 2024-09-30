@@ -9,8 +9,10 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import com.mycompany.ecommerce.order.model.Order;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class OrderMessageListener {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderMessageListener.class);
@@ -21,13 +23,12 @@ public class OrderMessageListener {
         key = "order.created"
     ))
     public void handleorderCreated(Order order) {
-        logger.info("Received order created event: {}", order);
-        try {
-            logger.info("order.created -> " + order);
-        } catch (Exception e) {
-            logger.error("Error processing new order", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","order-exchange");
+        log.info("routingKey: {}","order.created");
+        log.info("Mensagem: {}", order);        
+        log.info("*********************************");     
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -36,13 +37,12 @@ public class OrderMessageListener {
         key = "order.updated"
     ))
     public void handleorderUpdated(Order order) {
-        logger.info("Received order updated event: {}", order);
-        try {
-            logger.info("order.updated -> " + order);
-        } catch (Exception e) {
-            logger.error("Error processing updated order", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","order-exchange");
+        log.info("routingKey: {}","order.updated");
+        log.info("Mensagem: {}", order);        
+        log.info("*********************************");         
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -51,12 +51,11 @@ public class OrderMessageListener {
         key = "order.deleted"
     ))
     public void handleorderDeleted(Long orderId) {
-        logger.info("Received order deleted event for ID: {}", orderId);
-        try {
-            logger.info("order.delete -> " + orderId);
-        } catch (Exception e) {
-            logger.error("Error processing deleted order", e);
-            // Implementar lógica de tratamento de erro, como retry ou dead-letter queue
-        }
+        log.info("*********************************");
+        log.info("Mensagem recebida:");
+        log.info("exchange: {}","order-exchange");
+        log.info("routingKey: {}","order.deleted");
+        log.info("Mensagem: {}", orderId);        
+        log.info("*********************************");         
     }
 }
