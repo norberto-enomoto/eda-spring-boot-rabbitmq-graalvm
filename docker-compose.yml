@@ -122,6 +122,32 @@ services:
     networks:
       - app-network
 
+  consumer-service:    
+    container_name: consumer-service
+    build:
+      context: ./consumer-service
+      dockerfile: Dockerfile    
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      eureka-service:
+        condition: service_started
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: myuser
+      SPRING_RABBITMQ_PASSWORD: mypassword
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://eureka-service:8761/eureka/
+    networks:
+      - app-network
+
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -137,6 +163,8 @@ services:
       order-service:
         condition: service_started
       product-service:
+        condition: service_started
+      consumer-service:
         condition: service_started
     networks:
       - app-network

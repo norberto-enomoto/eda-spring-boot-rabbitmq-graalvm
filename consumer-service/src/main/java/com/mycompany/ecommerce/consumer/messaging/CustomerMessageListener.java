@@ -1,4 +1,4 @@
-package com.mycompany.ecommerce.customer.messaging;
+package com.mycompany.ecommerce.consumer.messaging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,8 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import com.mycompany.ecommerce.customer.model.Customer;
+
+import com.mycompany.ecommerce.consumer.model.Customer;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -12,6 +12,7 @@ graph TB
         PRODUCT["Serviço de Produtos<br>(Spring Boot + MySQL)"]
         ORDER["Serviço de Pedidos<br>(Spring Boot + MySQL)"]
         USER["Serviço de Usuários<br>(Spring Boot + MySQL)"]
+        CONSUMER["ConsumerService<br>(Spring Boot)"]
     end
 
     CLIENT["Cliente"]
@@ -24,11 +25,13 @@ graph TB
     PRODUCT -->|Registry| EUREKA
     ORDER -->|Registry| EUREKA
     USER -->|Registry| EUREKA
+    CONSUMER -->|Registry| EUREKA
     GATEWAY -->|Service Discovery| EUREKA
 
     PRODUCT <-->|Pub/Sub| RABBITMQ
     ORDER <-->|Pub/Sub| RABBITMQ
     USER <-->|Pub/Sub| RABBITMQ
+    RABBITMQ -->|Consume| CONSUMER
 
     subgraph "Banco de Dados"
         PRODUCT_DB[(Produtos DB<br>MySQL)]

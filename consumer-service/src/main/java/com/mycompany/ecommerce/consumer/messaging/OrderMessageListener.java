@@ -1,4 +1,4 @@
-package com.mycompany.ecommerce.order.messaging;
+package com.mycompany.ecommerce.consumer.messaging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,15 +8,14 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import com.mycompany.ecommerce.order.model.Order;
+import com.mycompany.ecommerce.consumer.model.Order;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class OrderMessageListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(OrderMessageListener.class);
-
+    
     @RabbitListener(bindings = @QueueBinding(
         value = @Queue(value = "order.created.queue", durable = "true"),
         exchange = @Exchange(value = "order-exchange", type = "topic"),
