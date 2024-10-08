@@ -4,6 +4,7 @@
 FROM maven:3.9.9-amazoncorretto-21 AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
+# COPY healthcheck.sh /healthcheck.sh
 RUN mvn -DskipTests -f /home/app/pom.xml clean package 
 
 #
@@ -11,5 +12,6 @@ RUN mvn -DskipTests -f /home/app/pom.xml clean package
 #
 FROM amazoncorretto:21.0.4-alpine3.20
 COPY --from=build /home/app/target/eureka-service-0.0.1-SNAPSHOT.jar /usr/local/lib/eureka-service-0.0.1-SNAPSHOT.jar
+# ENTRYPOINT ["/healthcheck.sh"]
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/usr/local/lib/eureka-service-0.0.1-SNAPSHOT.jar"]
+CMD ["java","-jar","/usr/local/lib/eureka-service-0.0.1-SNAPSHOT.jar"]
