@@ -43,7 +43,7 @@ graph TB
     ORDER -->|JDBC| ORDER_DB
     USER -->|JDBC| USER_DB
 ```
-
+- Criar todas as imagens: ./build-image.sh
 - Executar o docker compose: docker-compose up
 
 ## Exemplos de Chamadas para os Endpoints
@@ -181,8 +181,7 @@ Para testar o sistema de forma mais realista, você pode seguir este fluxo:
 3. Crie um pedido para o cliente criado, incluindo os produtos criados, usando o endpoint do Serviço de Pedidos.
 4. Atualize o status do pedido para "CONFIRMED".
 5. Verifique se o estoque dos produtos foi atualizado adequadamente.
+6. Vc poderá verificar as mennsagens criadas a partir do microsserviço: consumer-service
 
 Este fluxo simula um cenário típico de e-commerce e permite que você observe como os diferentes serviços interagem entre si através dos eventos publicados no Kafka.
-=======
-# eda-spring-boot-rabbitmq-graalvm
-Event Driven Architecture using Spring Boot, RabbitMQ and GraalVM
+
