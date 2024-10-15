@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Diagrama de Arquitetura - Event Driven Architecture (EDA) utilizando RabbitMQ
 
 ```mermaid
@@ -183,3 +184,7 @@ Para testar o sistema de forma mais realista, você pode seguir este fluxo:
 5. Verifique se o estoque dos produtos foi atualizado adequadamente.
 
 Este fluxo simula um cenário típico de e-commerce e permite que você observe como os diferentes serviços interagem entre si através dos eventos publicados no Kafka.
+=======
+# eda-spring-boot-rabbitmq-graalvm
+Event Driven Architecture using Spring Boot, RabbitMQ and GraalVM
+>>>>>>> bf134e6799aa22d5a716139264144a2106da57b2
