@@ -16,7 +16,21 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
-      retries: 10      
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=myuser
+      - RABBITMQ_DEFAULT_PASS=mypassword
+    networks:
+      - app-network      
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
 
   eureka-service:
     image: eureka-service
@@ -36,19 +50,26 @@ services:
     networks:
       - app-network
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "8080:8080"
     environment:
-      - RABBITMQ_DEFAULT_USER=myuser
-      - RABBITMQ_DEFAULT_PASS=mypassword
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://eureka-service:8761/eureka/      
+    depends_on:
+      eureka-service:
+        condition: service_started
+      customer-service:
+        condition: service_started
+      order-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+      consumer-service:
+        condition: service_started
     networks:
       - app-network      
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
 
   customer-service:
     image: customer-service
@@ -62,29 +83,6 @@ services:
         condition: service_started
     ports:
       - "8083:8083"
-    environment:
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: myuser
-      SPRING_RABBITMQ_PASSWORD: mypassword
-      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://eureka-service:8761/eureka/
-    networks:
-      - app-network
-
-  order-service:
-    image: order-service
-    container_name: order-service
-    depends_on:
-      eureka-service:
-        condition: service_started
-      mysql:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_started
-    ports:
-      - "8082:8082"
     environment:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
@@ -119,6 +117,29 @@ services:
     networks:
       - app-network
 
+  order-service:
+    image: order-service
+    container_name: order-service
+    depends_on:
+      eureka-service:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: myuser
+      SPRING_RABBITMQ_PASSWORD: mypassword
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://eureka-service:8761/eureka/
+    networks:
+      - app-network
+  
   consumer-service:    
     image: consumer-service
     container_name: consumer-service
@@ -140,29 +161,7 @@ services:
       SPRING_RABBITMQ_PASSWORD: mypassword
       EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://eureka-service:8761/eureka/
     networks:
-      - app-network
-
-
-  api-gateway:
-    image: api-gateway
-    container_name: api-gateway
-    ports:
-      - "8080:8080"
-    environment:
-      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://eureka-service:8761/eureka/      
-    depends_on:
-      eureka-service:
-        condition: service_started
-      customer-service:
-        condition: service_started
-      order-service:
-        condition: service_started
-      product-service:
-        condition: service_started
-      consumer-service:
-        condition: service_started
-    networks:
-      - app-network
+      - app-network  
 
 networks:
   app-network:
