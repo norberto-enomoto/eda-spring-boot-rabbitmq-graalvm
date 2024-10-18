@@ -31,7 +31,7 @@ COPY --from=builder /home/app/target/customer-service /app/customer-service
 RUN chmod +x /app/customer-service
 
 # Expor a porta que o aplicativo usa
-EXPOSE 8080
+EXPOSE 8083
 
 # Comando para executar o aplicativo
 ENTRYPOINT ["./customer-service"]

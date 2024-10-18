@@ -31,7 +31,7 @@ COPY --from=builder /home/app/target/product-service /app/product-service
 RUN chmod +x /app/product-service
 
 # Expor a porta que o aplicativo usa
-EXPOSE 8080
+EXPOSE 8082
 
 # Comando para executar o aplicativo
 ENTRYPOINT ["./product-service"]

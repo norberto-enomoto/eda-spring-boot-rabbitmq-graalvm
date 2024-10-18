@@ -1,48 +1,66 @@
 # Diagrama de Arquitetura - Event Driven Architecture (EDA) utilizando RabbitMQ
 
-```mermaid
 graph TB
-    subgraph "Infraestrutura"
-        EUREKA["Eureka Server"]
-        GATEWAY["API Gateway<br>(Spring Cloud Gateway)"]
-        RABBITMQ["RabbitMQ"]
+    subgraph "Camada de Cliente"
+        Client[Cliente]
     end
 
-    subgraph "Microsserviços"
-        PRODUCT["Serviço de Produtos<br>(Spring Boot + MySQL)"]
-        ORDER["Serviço de Pedidos<br>(Spring Boot + MySQL)"]
-        USER["Serviço de Usuários<br>(Spring Boot + MySQL)"]
-        CONSUMER["ConsumerService<br>(Spring Boot)"]
+    subgraph "Camada de Gateway"
+        APIGW["Gateway (Spring Cloud Gateway)"]
     end
 
-    CLIENT["Cliente"]
-
-    CLIENT -->|HTTP/HTTPS| GATEWAY
-    GATEWAY -->|HTTP| PRODUCT
-    GATEWAY -->|HTTP| ORDER
-    GATEWAY -->|HTTP| USER
-
-    PRODUCT -->|Registry| EUREKA
-    ORDER -->|Registry| EUREKA
-    USER -->|Registry| EUREKA
-    CONSUMER -->|Registry| EUREKA
-    GATEWAY -->|Service Discovery| EUREKA
-
-    PRODUCT <-->|Pub/Sub| RABBITMQ
-    ORDER <-->|Pub/Sub| RABBITMQ
-    USER <-->|Pub/Sub| RABBITMQ
-    RABBITMQ -->|Consume| CONSUMER
-
-    subgraph "Banco de Dados"
-        PRODUCT_DB[(Produtos DB<br>MySQL)]
-        ORDER_DB[(Pedidos DB<br>MySQL)]
-        USER_DB[(Usuários DB<br>MySQL)]
+    subgraph "Camada de Descoberta de Serviço"
+        Eureka[Eureka Server]
     end
 
-    PRODUCT -->|JDBC| PRODUCT_DB
-    ORDER -->|JDBC| ORDER_DB
-    USER -->|JDBC| USER_DB
-```
+    subgraph "Camada de Microsserviços"
+        MS1[Microsserviço <br>Produtos]
+        MS2[Microsserviço <br>Pedidos]
+        MS3[Microsserviço <br>Usuários]
+        MS4[Microsserviço <br>ConsumerService]
+    end
+
+    subgraph "Camada de Mensageria"
+        RabbitMQ[RabbitMQ]
+    end
+
+    subgraph "Camada de Dados"
+        DB1[(MySQL<br>Produtos)]
+        DB2[(MySQL<br>Pedidos)]
+        DB3[(MySQL<br>Usuários)]
+    end
+
+    Client -->|HTTP/HTTPS| APIGW
+    APIGW -->|HTTP| MS1
+    APIGW -->|HTTP| MS2
+    APIGW -->|HTTP| MS3
+
+    MS1 -->|Registra| Eureka
+    MS2 -->|Registra| Eureka
+    MS3 -->|Registra| Eureka
+    MS4 -->|Registra| Eureka
+    APIGW -->|Consulta| Eureka
+
+    MS1 <-->|Pub/Sub| RabbitMQ
+    MS2 <-->|Pub/Sub| RabbitMQ
+    MS3 <-->|Pub/Sub| RabbitMQ
+    RabbitMQ -->|Consume| MS4
+
+    MS1 -->|JDBC| DB1
+    MS2 -->|JDBC| DB2
+    MS3 -->|JDBC| DB3
+
+    classDef microservice fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef database fill:#bdf,stroke:#333,stroke-width:2px;
+    classDef gateway fill:#fdfd96,stroke:#333,stroke-width:2px;
+    classDef discovery fill:#90EE90,stroke:#333,stroke-width:2px;
+    classDef messaging fill:#FFA07A,stroke:#333,stroke-width:2px;
+    class MS1,MS2,MS3,MS4 microservice;
+    class DB1,DB2,DB3 database;
+    class APIGW gateway;
+    class Eureka discovery;
+    class RabbitMQ messaging;
+
 - Criar todas as imagens: ./build-image.sh
 - Executar o docker compose: docker-compose up
 
@@ -54,7 +72,7 @@ Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos
 
 1. Criar um novo cliente:
    ```bash
-   curl -X POST http://localhost:8080/customers \
+   curl -X POST http://localhost:8080/api/customers \
    -H "Content-Type: application/json" \
    -d '{
      "name": "João Silva",
@@ -65,17 +83,17 @@ Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos
 
 2. Obter todos os clientes:
    ```bash
-   curl http://localhost:8080/customers
+   curl http://localhost:8080/api/customers
    ```
 
 3. Obter um cliente específico (substitua {id} pelo ID real do cliente):
    ```bash
-   curl http://localhost:8080/customers/{id}
+   curl http://localhost:8080/api/customers/{id}
    ```
 
 4. Atualizar um cliente (substitua {id} pelo ID real do cliente):
    ```bash
-   curl -X PUT http://localhost:8080/customers/{id} \
+   curl -X PUT http://localhost:8080/api/customers/{id} \
    -H "Content-Type: application/json" \
    -d '{
      "name": "João Silva Jr.",
@@ -85,14 +103,14 @@ Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos
 
 5. Deletar um cliente (substitua {id} pelo ID real do cliente):
    ```bash
-   curl -X DELETE http://localhost:8080/customers/{id}
+   curl -X DELETE http://localhost:8080/api/customers/{id}
    ```
 
 ### Serviço de Produtos
 
 1. Criar um novo produto:
    ```bash
-   curl -X POST http://localhost:8080/products \
+   curl -X POST http://localhost:8080/api/products \
    -H "Content-Type: application/json" \
    -d '{
      "name": "Smartphone XYZ",
@@ -104,17 +122,17 @@ Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos
 
 2. Obter todos os produtos:
    ```bash
-   curl http://localhost:8080/products
+   curl http://localhost:8080/api/products
    ```
 
 3. Obter um produto específico (substitua {id} pelo ID real do produto):
    ```bash
-   curl http://localhost:8080/products/{id}
+   curl http://localhost:8080/api/products/{id}
    ```
 
 4. Atualizar um produto (substitua {id} pelo ID real do produto):
    ```bash
-   curl -X PUT http://localhost:8080/products/{id} \
+   curl -X PUT http://localhost:8080/api/products/{id} \
    -H "Content-Type: application/json" \
    -d '{
      "name": "Smartphone XYZ - Edição Especial",
@@ -126,19 +144,19 @@ Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos
 
 5. Deletar um produto (substitua {id} pelo ID real do produto):
    ```bash
-   curl -X DELETE http://localhost:8080/products/{id}
+   curl -X DELETE http://localhost:8080/api/products/{id}
    ```
 
 6. Atualizar o estoque de um produto (substitua {id} pelo ID real do produto):
    ```bash
-   curl -X PATCH http://localhost:8080/products/{id}/stock?quantity=20
+   curl -X PATCH http://localhost:8080/api/products/{id}/stock?quantity=20
    ```
 
 ### Serviço de Pedidos
 
 1. Criar um novo pedido:
    ```bash
-   curl -X POST http://localhost:8080/orders \
+   curl -X POST http://localhost:8080/api/orders \
    -H "Content-Type: application/json" \
    -d '{
      "customerId": 1,
@@ -155,17 +173,17 @@ Aqui estão exemplos de como chamar os endpoints dos serviços que implementamos
 
 2. Obter todos os pedidos:
    ```bash
-   curl http://localhost:8080/orders
+   curl http://localhost:8080/api/orders
    ```
 
 3. Obter um pedido específico (substitua {id} pelo ID real do pedido):
    ```bash
-   curl http://localhost:8080/orders/{id}
+   curl http://localhost:8080/api/orders/{id}
    ```
 
 4. Atualizar o status de um pedido (substitua {id} pelo ID real do pedido):
    ```bash
-   curl -X PATCH http://localhost:8080/orders/{id}/status?status=CONFIRMED
+   curl -X PATCH http://localhost:8080/api/orders/{id}/status?status=CONFIRMED
    ```
 
 Lembre-se de que essas chamadas estão sendo feitas através do API Gateway na porta 8080. O gateway redireciona as requisições para os serviços apropriados com base no path da URL.

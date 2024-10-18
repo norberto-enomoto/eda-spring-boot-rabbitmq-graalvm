@@ -1,7 +1,5 @@
 package com.mycompany.ecommerce.consumer.messaging;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -16,9 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class CustomerMessageListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(CustomerMessageListener.class);
+public class CustomerMessageListener {    
 
     @RabbitListener(bindings = @QueueBinding(
         value = @Queue(value = "customer.created.queue", durable = "true"),

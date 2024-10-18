@@ -82,7 +82,7 @@ services:
       rabbitmq:
         condition: service_started
     ports:
-      - "8083:8083"
+      - "8081:8081"
     environment:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
@@ -105,7 +105,7 @@ services:
       rabbitmq:
         condition: service_started
     ports:
-      - "8081:8081"
+      - "8082:8082"
     environment:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
@@ -128,7 +128,7 @@ services:
       rabbitmq:
         condition: service_started
     ports:
-      - "8082:8082"
+      - "8083:8083"
     environment:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
