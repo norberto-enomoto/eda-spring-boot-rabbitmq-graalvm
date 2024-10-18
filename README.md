@@ -1,5 +1,6 @@
 # Diagrama de Arquitetura - Event Driven Architecture (EDA) utilizando RabbitMQ
 
+```mermaid
 graph TB
     subgraph "Camada de Cliente"
         Client[Cliente]
@@ -60,6 +61,7 @@ graph TB
     class APIGW gateway;
     class Eureka discovery;
     class RabbitMQ messaging;
+```    
 
 - Criar todas as imagens: ./build-image.sh
 - Executar o docker compose: docker-compose up
