@@ -12,10 +12,11 @@ build_image() {
 
 # Construir imagens na ordem
 build_image "eureka-service"
-build_image "customer-service"
-build_image "order-service"
-build_image "product-service"
-build_image "consumer-service"
 build_image "api-gateway"
+build_image "customer-service"
+build_image "product-service"
+build_image "order-service"
+build_image "consumer-service"
+
 
 echo "Todas as imagens foram construídas com sucesso!"

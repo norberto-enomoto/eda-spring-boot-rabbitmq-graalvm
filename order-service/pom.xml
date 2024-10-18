@@ -117,18 +117,22 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.graalvm.buildtools</groupId>
-				<artifactId>native-maven-plugin</artifactId>
-				<configuration>
-					<buildArgs>
-						<buildArg>--initialize-at-run-time=java.sql.DriverManager,com.mysql.cj.jdbc.AbandonedConnectionCleanupThread</buildArg>
-						<buildArg>--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback</buildArg>
-						<buildArg>--allow-incomplete-classpath</buildArg>
-						<buildArg>--report-unsupported-elements-at-runtime</buildArg>
-					</buildArgs>
-				</configuration>
-			</plugin>			
+				<plugin>
+					<groupId>org.graalvm.buildtools</groupId>
+					<artifactId>native-maven-plugin</artifactId>
+					<configuration>
+						<classesDirectory>${project.build.outputDirectory}</classesDirectory>
+						<metadataRepository>
+							<enabled>true</enabled>
+						</metadataRepository>
+						<buildArgs>
+							<buildArg>--initialize-at-run-time=java.sql.DriverManager,com.mysql.cj.jdbc.AbandonedConnectionCleanupThread</buildArg>
+							<buildArg>--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback</buildArg>
+							<buildArg>--allow-incomplete-classpath</buildArg>
+							<buildArg>--report-unsupported-elements-at-runtime</buildArg>
+						</buildArgs>
+					</configuration>
+				</plugin>			
 		</plugins>
 	</build>
 	<repositories>
